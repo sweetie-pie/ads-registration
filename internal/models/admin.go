@@ -1,7 +1,5 @@
 package models
 
-import "gorm.io/gorm"
-
 const (
 	AccessLevelViewer = 1
 	AccessLevelWriter = 2
@@ -9,7 +7,7 @@ const (
 )
 
 type Admin struct {
-	gorm.Model
+	BaseModel
 	Username    string `gorm:"unique"`
 	Password    string
 	Email       string `gorm:"unique"`

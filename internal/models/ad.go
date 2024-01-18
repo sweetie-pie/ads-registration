@@ -1,9 +1,13 @@
 package models
 
-import "gorm.io/gorm"
+const (
+	PublishedStatus = 1
+	RejectedStatus  = 2
+	PendingStatus   = 3
+)
 
 type Ad struct {
-	gorm.Model
+	BaseModel
 	Title       string `gorm:"unique"`
 	Description string
 	Status      int
