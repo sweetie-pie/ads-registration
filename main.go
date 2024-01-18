@@ -42,7 +42,7 @@ func main() {
 	}
 
 	// register and start http server
-	if err := httpHandler.Register(); err != nil {
+	if err := httpHandler.Register(os.Getenv("HTTP_PORT")); err != nil {
 		log.Fatal("error registering the http server", err)
 	}
 }
