@@ -22,40 +22,41 @@ func (h HTTP) Register(port string) error {
 
 	// auth group apis
 	auth := app.Group("/auth")
-	auth.Post("/user/login")  // for users
-	auth.Post("/user/signin") // for users
-	auth.Post("/admin/login") // for admins
+	auth.Post("/user/login", h.UserLogin)   // for users
+	auth.Post("/user/signup", h.UserSignup) // for users
+	auth.Post("/admin/login", h.AdminLogin) // for admins
 
 	api := app.Group("/api", JWTToken)
 
 	// ads apis
 	ads := api.Group("/ads", CheckBannedUser)
-	ads.Get("/")
-	ads.Post("/")
-	ads.Post("/:id")
-	ads.Delete("/:id")
-	ads.Get("/:id/image")
+	ads.Get("/", h.GetAds)
+	ads.Post("/", h.CreateAd)
+	ads.Post("/:id", h.UpdateAd)
+	ads.Delete("/:id", h.DeleteAd)
+	ads.Get("/:id/image", h.GetAdImage)
+	ads.Post("/:id/status", CheckAdmin, CheckAccessLevel(2, 3), h.UpdateUserAd)
 
 	// categories apis
 	categories := api.Group("/categories")
-	categories.Get("/")
-	categories.Post("/", CheckAdmin, CheckAccessLevel(2, 3))
-	categories.Delete("/:id", CheckAdmin, CheckAccessLevel(2, 3))
+	categories.Get("/", h.GetCategories)
+	categories.Post("/", CheckAdmin, CheckAccessLevel(2, 3), h.CreateCategory)
+	categories.Delete("/:id", CheckAdmin, CheckAccessLevel(2, 3), h.DeleteCategory)
 
 	// users apis
 	users := api.Group("/users", CheckAdmin)
-	users.Get("/", CheckAccessLevel(1, 2, 3))
-	users.Post("/", CheckAccessLevel(2, 3))
-	users.Post("/:id", CheckAccessLevel(2, 3))
-	users.Delete("/:id", CheckAccessLevel(2, 3))
-	users.Post("/ads/:id", CheckAccessLevel(2, 3))
+	users.Get("/", CheckAccessLevel(1, 2, 3), h.GetUsers)
+	users.Post("/", CheckAccessLevel(2, 3), h.CreateUser)
+	users.Post("/:id", CheckAccessLevel(2, 3), h.UpdateUser)
+	users.Delete("/:id", CheckAccessLevel(2, 3), h.DeleteUser)
 
 	// admins apis
 	admins := api.Group("/admins", CheckAdmin, CheckAccessLevel(3))
-	admins.Get("/")
-	admins.Post("/")
-	admins.Post("/:id")
-	admins.Delete("/:id")
+	admins.Get("/", h.GetAdmins)
+	admins.Post("/", h.CreateAdmin)
+	admins.Post("/:id", h.UpdateAdmin)
+	admins.Delete("/:id", h.DeleteAdmin)
 
+	// start application
 	return app.Listen(fmt.Sprintf(":%s", port))
 }
