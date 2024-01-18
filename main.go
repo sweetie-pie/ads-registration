@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/asaldelkhosh/ads-registration/internal/http"
+	"github.com/asaldelkhosh/ads-registration/internal/models"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
@@ -23,6 +24,23 @@ func readDatabaseCredentialsFromEnv() string {
 	)
 }
 
+func migrateDatabaseModels(db *gorm.DB) error {
+	classes := []interface{}{
+		&models.User{},
+		&models.Admin{},
+		&models.Ad{},
+		&models.Category{},
+	}
+
+	for _, class := range classes {
+		if err := db.AutoMigrate(class); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	// load .env file
 	err := godotenv.Load()
@@ -36,7 +54,10 @@ func main() {
 		log.Fatal("error connecting to database", err)
 	}
 
-	// todo: migrate models
+	// migrate models
+	if err := migrateDatabaseModels(db); err != nil {
+		log.Fatal("error migrating models", err)
+	}
 
 	// create image directory
 	if _, err := os.Stat("/images"); os.IsNotExist(err) {
