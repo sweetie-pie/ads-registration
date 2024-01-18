@@ -36,6 +36,15 @@ func main() {
 		log.Fatal("error connecting to database", err)
 	}
 
+	// todo: migrate models
+
+	// create image directory
+	if _, err := os.Stat("/images"); os.IsNotExist(err) {
+		if er := os.Mkdir("images", 0750); er != nil {
+			log.Fatal("error creating images dir", er)
+		}
+	}
+
 	// create new http handler
 	httpHandler := http.HTTP{
 		DB: db,

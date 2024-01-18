@@ -34,6 +34,7 @@ func (h HTTP) Register(port string) error {
 	ads.Post("/")
 	ads.Post("/:id")
 	ads.Delete("/:id")
+	ads.Get("/:id/image")
 
 	// categories apis
 	categories := api.Group("/categories", CheckAdmin)
