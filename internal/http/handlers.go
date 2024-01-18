@@ -1,17 +1,91 @@
 package http
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"encoding/base64"
+
+	"github.com/asaldelkhosh/ads-registration/internal/models"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 func (h HTTP) UserLogin(ctx *fiber.Ctx) error {
-	return nil
+	req := new(UserRequest)
+
+	if err := ctx.BodyParser(req); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	user := new(models.User)
+
+	// get user
+	if err := h.DB.Model(&models.User{}).Where("username = ?", req.Username).First(user).Error; err != nil {
+		return fiber.ErrNotFound
+	}
+
+	// check password
+	if user.Password != base64.StdEncoding.EncodeToString([]byte(req.Password)) {
+		return fiber.ErrUnauthorized
+	}
+
+	// create claims
+	claims := &UserClaims{
+		Username: user.Username,
+		IsAdmin:  false,
+		Banned:   user.Banned,
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(claims)
 }
 
 func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
-	return nil
+	req := new(UserRequest)
+
+	if err := ctx.BodyParser(req); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	model := &models.User{
+		Username: req.Username,
+		Password: base64.StdEncoding.EncodeToString([]byte(req.Password)),
+		Email:    req.Email,
+		Banned:   false,
+	}
+
+	if err := h.DB.Create(model); err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }
 
 func (h HTTP) AdminLogin(ctx *fiber.Ctx) error {
-	return nil
+	req := new(UserRequest)
+
+	if err := ctx.BodyParser(req); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	user := new(models.Admin)
+
+	// get user
+	if err := h.DB.Model(&models.User{}).Where("username = ?", req.Username).First(user).Error; err != nil {
+		return fiber.ErrNotFound
+	}
+
+	// check password
+	if user.Password != base64.StdEncoding.EncodeToString([]byte(req.Password)) {
+		return fiber.ErrUnauthorized
+	}
+
+	// create claims
+	claims := &UserClaims{
+		Username:    user.Username,
+		IsAdmin:     false,
+		Active:      user.Active,
+		AccessLevel: user.AccessLevel,
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(claims)
 }
 
 func (h HTTP) GetAds(ctx *fiber.Ctx) error {
