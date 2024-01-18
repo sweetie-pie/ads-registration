@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/asaldelkhosh/ads-registration/internal/http"
+
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -32,5 +34,15 @@ func main() {
 	db, err := gorm.Open(mysql.Open(readDatabaseCredentialsFromEnv()), &gorm.Config{})
 	if err != nil {
 		log.Fatal("error connecting to database", err)
+	}
+
+	// create new http handler
+	httpHandler := http.HTTP{
+		DB: db,
+	}
+
+	// register and start http server
+	if err := httpHandler.Register(); err != nil {
+		log.Fatal("error registering the http server", err)
 	}
 }
