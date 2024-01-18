@@ -41,3 +41,8 @@ type CategoryResponse struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
+
+type SearchResponse struct {
+	Ads        []AdResponse       `json:"ads"`
+	Categories []CategoryResponse `json:"categories"`
+}

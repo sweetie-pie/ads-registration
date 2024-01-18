@@ -24,3 +24,10 @@ type CategoryRequest struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
+
+type AdQuery struct {
+	IDs        []uint   `json:"ids"`
+	Titles     []string `json:"titles"`
+	Categories []string `json:"categories"`
+	Keyword    string   `json:"keyword"`
+}

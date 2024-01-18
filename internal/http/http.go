@@ -37,10 +37,10 @@ func (h HTTP) Register(port string) error {
 	ads.Get("/:id/image")
 
 	// categories apis
-	categories := api.Group("/categories", CheckAdmin)
-	categories.Get("/", CheckAccessLevel(1, 2, 3))
-	categories.Post("/", CheckAccessLevel(2, 3))
-	categories.Delete("/:id", CheckAccessLevel(2, 3))
+	categories := api.Group("/categories")
+	categories.Get("/")
+	categories.Post("/", CheckAdmin, CheckAccessLevel(2, 3))
+	categories.Delete("/:id", CheckAdmin, CheckAccessLevel(2, 3))
 
 	// users apis
 	users := api.Group("/users", CheckAdmin)
