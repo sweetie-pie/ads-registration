@@ -8,12 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
+// HTTP handles the http endpoints.
 type HTTP struct {
 	DB     *gorm.DB
 	JWTKey string
 }
 
+// Register the http server.
 func (h HTTP) Register(port string) error {
+	// use fiber framework
 	app := fiber.New()
 
 	// logger middleware
@@ -21,6 +24,7 @@ func (h HTTP) Register(port string) error {
 		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
 	}))
 
+	// create api group
 	api := app.Group("/api")
 
 	// auth apis

@@ -2,6 +2,7 @@ package http
 
 import "github.com/gofiber/fiber/v2"
 
+// JWTToken parses user JWT from http request.
 func JWTToken(key string) func(ctx *fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
 		token := ctx.Get("x-token", "null")
@@ -20,6 +21,7 @@ func JWTToken(key string) func(ctx *fiber.Ctx) error {
 	}
 }
 
+// CheckAccessLevel before running a handler.
 func CheckAccessLevel(levels ...int) func(ctx *fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
 		claims := ctx.Locals("user").(*UserClaims)

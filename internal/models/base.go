@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// BaseModel of our database.
 type BaseModel struct {
 	ID        uint `gorm:"primarykey"`
 	CreatedAt time.Time

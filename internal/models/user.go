@@ -6,6 +6,7 @@ const (
 	AccessLevelAdmin  = 3
 )
 
+// User model of the system's users.
 type User struct {
 	BaseModel
 	Username    string `gorm:"unique"`

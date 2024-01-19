@@ -6,6 +6,7 @@ const (
 	PendingStatus   = 3
 )
 
+// Ad is the base ad model of the service.
 type Ad struct {
 	BaseModel
 	Title       string `gorm:"unique"`
