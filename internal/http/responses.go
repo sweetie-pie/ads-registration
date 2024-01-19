@@ -8,10 +8,11 @@ type TokenResponse struct {
 }
 
 type UserResponse struct {
-	ID        uint      `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
+	ID          uint      `json:"id"`
+	Username    string    `json:"username"`
+	Email       string    `json:"email"`
+	AccessLevel int       `json:"access_level"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type AdResponse struct {

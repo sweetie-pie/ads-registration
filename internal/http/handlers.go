@@ -265,8 +265,29 @@ func (h HTTP) GetAdImage(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).SendFile("./images/" + ad.Image)
 }
 
+// GetUsers returns a list of the system users.
 func (h HTTP) GetUsers(ctx *fiber.Ctx) error {
-	return nil
+	// create a list of users
+	records := make([]*models.User, 0)
+
+	// get from db
+	if err := h.DB.Model(&models.User{}).Find(records).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	// convert to response
+	list := make([]*UserResponse, 0)
+	for _, user := range records {
+		list = append(list, &UserResponse{
+			ID:          user.ID,
+			Username:    user.Username,
+			Email:       user.Email,
+			AccessLevel: user.AccessLevel,
+			CreatedAt:   user.CreatedAt,
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(list)
 }
 
 func (h HTTP) CreateUser(ctx *fiber.Ctx) error {
