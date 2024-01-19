@@ -58,6 +58,15 @@ func main() {
 		log.Fatal("error migrating models", err)
 	}
 
+	// insert admin user
+	if err := db.Create(&models.User{
+		Username:    os.Getenv("ADMIN_NAME"),
+		Password:    os.Getenv("ADMIN_PASS"),
+		AccessLevel: models.AccessLevelAdmin,
+	}).Error; err != nil {
+		log.Println(err)
+	}
+
 	// create image directory
 	if _, err := os.Stat("images"); os.IsNotExist(err) {
 		if er := os.Mkdir("images", 0750); er != nil {

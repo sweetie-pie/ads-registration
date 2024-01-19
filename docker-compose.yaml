@@ -12,7 +12,7 @@ services:
       DB_PORT: "3306"
       DB_NAME: "ads"
       ADMIN_NAME: "admin"
-      ADMIN_PASS: "12345"
+      ADMIN_PASS: "MTIzNDU=" # password is 12345
       JWT_KEY: "88512%sup%*119"
       HTTP_PORT: "8080"
     ports:
