@@ -71,8 +71,20 @@ func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
+// GetCategories return a list of current categories.
 func (h HTTP) GetCategories(ctx *fiber.Ctx) error {
-	return nil
+	records := make([]*models.Category, 0)
+
+	if err := h.DB.Model(&models.Category{}).Distinct("title").Find(records).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	list := make([]string, 0)
+	for _, item := range records {
+		list = append(list, item.Title)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(list)
 }
 
 func (h HTTP) GetAds(ctx *fiber.Ctx) error {
