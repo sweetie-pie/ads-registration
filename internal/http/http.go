@@ -36,7 +36,7 @@ func (h HTTP) Register(port string) error {
 
 	// ads global apis
 	ads := api.Group("/ads")
-	ads.Get("/", h.GetAds)
+	ads.Get("/", h.GetAds) // query keyword for searching
 	ads.Get("/:id", h.GetAd)
 	ads.Get("/:id/image", h.GetAdImage)
 

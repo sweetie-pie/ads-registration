@@ -3,6 +3,6 @@ package models
 // Category model of ads.
 type Category struct {
 	BaseModel
-	Title string `gorm:"unique"`
+	Title string
 	AdID  uint
 }

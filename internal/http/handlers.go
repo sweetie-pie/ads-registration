@@ -93,6 +93,9 @@ func (h HTTP) GetCategories(ctx *fiber.Ctx) error {
 
 // GetAds manages ads list handler.
 func (h HTTP) GetAds(ctx *fiber.Ctx) error {
+	// get keyword
+	keyword := ctx.Query("keyword")
+
 	// create a list of ads
 	records := make([]*models.Ad, 0)
 
@@ -100,6 +103,12 @@ func (h HTTP) GetAds(ctx *fiber.Ctx) error {
 	query := h.DB.Model(&models.Ad{}).Preload("Categories")
 	if ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
 		query = query.Where("status = ?", models.PublishedStatus)
+	}
+
+	// add keyword query
+	if len(keyword) > 0 {
+		tmp := "%" + keyword + "%"
+		query = query.Where("categories.title like ? or ad.title like ?", tmp, tmp)
 	}
 
 	// get from db
