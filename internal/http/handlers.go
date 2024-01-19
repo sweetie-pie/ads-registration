@@ -35,8 +35,12 @@ func (h HTTP) UserLogin(ctx *fiber.Ctx) error {
 		Banned:   user.Banned,
 	}
 
+	// create jwt token
+	token, epr, _ := generateJWT(h.JWTKey, claims)
+
 	return ctx.Status(fiber.StatusOK).JSON(TokenResponse{
-		Token: generateJWT(h.JWTKey, claims),
+		Token:     token,
+		ExpiresAt: epr,
 	})
 }
 
@@ -94,8 +98,12 @@ func (h HTTP) AdminLogin(ctx *fiber.Ctx) error {
 		AccessLevel: user.AccessLevel,
 	}
 
+	// create jwt token
+	token, epr, _ := generateJWT(h.JWTKey, claims)
+
 	return ctx.Status(fiber.StatusOK).JSON(TokenResponse{
-		Token: generateJWT(h.JWTKey, claims),
+		Token:     token,
+		ExpiresAt: epr,
 	})
 }
 
