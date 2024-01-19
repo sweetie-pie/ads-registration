@@ -68,7 +68,8 @@ func main() {
 
 	// create new http handler
 	httpHandler := http.HTTP{
-		DB: db,
+		DB:     db,
+		JWTKey: os.Getenv("JWT_KEY"),
 	}
 
 	// register and start http server
