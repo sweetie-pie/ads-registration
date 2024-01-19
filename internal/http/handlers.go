@@ -73,12 +73,15 @@ func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
 
 // GetCategories return a list of current categories.
 func (h HTTP) GetCategories(ctx *fiber.Ctx) error {
+	// create a list of categories
 	records := make([]*models.Category, 0)
 
+	// get from db
 	if err := h.DB.Model(&models.Category{}).Distinct("title").Find(records).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
+	// convert to response
 	list := make([]string, 0)
 	for _, item := range records {
 		list = append(list, item.Title)
@@ -87,8 +90,41 @@ func (h HTTP) GetCategories(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(list)
 }
 
+// GetAds manages ads list handler.
 func (h HTTP) GetAds(ctx *fiber.Ctx) error {
-	return nil
+	// create a list of ads
+	records := make([]*models.Ad, 0)
+
+	// get from db
+	if err := h.DB.Model(&models.Ad{}).Preload("User").Preload("Categories").Find(records).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	// convert to response
+	list := make([]*AdResponse, 0)
+	for _, ad := range records {
+		// get categories list
+		tmp := make([]string, 0)
+		for _, item := range ad.Categories {
+			tmp = append(tmp, item.Title)
+		}
+
+		list = append(list, &AdResponse{
+			ID:          ad.ID,
+			Title:       ad.Title,
+			Description: ad.Description,
+			Status:      ad.Status,
+			Image:       ad.Image,
+			CreatedAt:   ad.CreatedAt,
+			Categories:  tmp,
+			User: UserResponse{
+				Username: ad.User.Username,
+				Email:    ad.User.Email,
+			},
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(list)
 }
 
 func (h HTTP) GetAd(ctx *fiber.Ctx) error {
@@ -99,7 +135,7 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 	ad := new(models.Ad)
 
 	// get ad from db
-	if err := h.DB.Model(&models.Ad{}).Preload("User").Preload("Categories").Where("id = ?", uint(id)).First(ad).Error; err != nil {
+	if err := h.DB.Model(&models.Ad{}).Preload("Categories").Where("id = ?", uint(id)).First(ad).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -122,10 +158,6 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 		Image:       ad.Image,
 		CreatedAt:   ad.CreatedAt,
 		Categories:  list,
-		User: UserResponse{
-			Username: ad.User.Username,
-			Email:    ad.User.Email,
-		},
 	})
 }
 
