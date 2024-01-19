@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/asaldelkhosh/ads-registration/internal/models"
 
@@ -86,7 +87,7 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 	ad := new(models.Ad)
 
 	// get ad from db
-	if err := h.DB.Model(&models.Ad{}).Where("id = ?", uint(id)).First(ad).Error; err != nil {
+	if err := h.DB.Model(&models.Ad{}).Preload("User").Preload("Categories").Where("id = ?", uint(id)).First(ad).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -95,12 +96,10 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 		return fiber.ErrNotFound
 	}
 
-	// get ad user
-	user := new(models.User)
-
-	// get user by id
-	if err := h.DB.Model(&models.User{}).Where("id = ?", ad.UserID).First(user).Error; err != nil {
-		return fiber.ErrNotFound
+	// get categories list
+	list := make([]string, 0)
+	for _, item := range ad.Categories {
+		list = append(list, item.Title)
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(AdResponse{
@@ -110,9 +109,10 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 		Status:      ad.Status,
 		Image:       ad.Image,
 		CreatedAt:   ad.CreatedAt,
+		Categories:  list,
 		User: UserResponse{
-			Username: user.Username,
-			Email:    user.Email,
+			Username: ad.User.Username,
+			Email:    ad.User.Email,
 		},
 	})
 }
@@ -122,6 +122,7 @@ func (h HTTP) CreateAd(ctx *fiber.Ctx) error {
 	// get ad information
 	title := ctx.FormValue("title")
 	description := ctx.FormValue("description")
+	categories := strings.Split(ctx.FormValue("categories"), ",")
 	userID := ctx.Locals("user").(*UserClaims).ID
 	image := ""
 
@@ -148,6 +149,19 @@ func (h HTTP) CreateAd(ctx *fiber.Ctx) error {
 
 	// save ad to database
 	if err := h.DB.Create(ad).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	// save categories
+	list := make([]*models.Category, 0)
+	for _, item := range categories {
+		list = append(list, &models.Category{
+			Title: item,
+			AdID:  ad.ID,
+		})
+	}
+
+	if err := h.DB.Create(list).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 

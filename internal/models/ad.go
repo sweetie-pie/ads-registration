@@ -13,6 +13,6 @@ type Ad struct {
 	Status      int
 	Image       string
 	UserID      uint
-	AdminID     uint
+	User        User
 	Categories  []Category
 }
