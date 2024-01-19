@@ -1,6 +1,8 @@
 package http
 
 import (
+	"fmt"
+
 	"github.com/asaldelkhosh/ads-registration/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -30,9 +32,9 @@ func (h HTTP) UserLogin(ctx *fiber.Ctx) error {
 
 	// create claims for jwt token
 	claims := &UserClaims{
-		Username: user.Username,
-		IsAdmin:  false,
-		Banned:   user.Banned,
+		ID:          user.ID,
+		Username:    user.Username,
+		AccessLevel: user.AccessLevel,
 	}
 
 	// create jwt token
@@ -58,7 +60,6 @@ func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
 		Username: req.Username,
 		Password: toBase64(req.Password),
 		Email:    req.Email,
-		Banned:   false,
 	}
 
 	// create user
@@ -69,42 +70,8 @@ func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
-// AdminLogin manages admin login.
-func (h HTTP) AdminLogin(ctx *fiber.Ctx) error {
-	req := new(UserRequest)
-
-	// parse request body
-	if err := ctx.BodyParser(req); err != nil {
-		return fiber.ErrBadRequest
-	}
-
-	user := new(models.Admin)
-
-	// get admin by username or email
-	if err := h.DB.Model(&models.Admin{}).Where("username = ? or email = ?", req.Username, req.Email).First(user).Error; err != nil {
-		return fiber.ErrNotFound
-	}
-
-	// check password
-	if user.Password != toBase64(req.Password) {
-		return fiber.ErrUnauthorized
-	}
-
-	// create claims
-	claims := &UserClaims{
-		Username:    user.Username,
-		IsAdmin:     false,
-		Active:      user.Active,
-		AccessLevel: user.AccessLevel,
-	}
-
-	// create jwt token
-	token, epr, _ := generateJWT(h.JWTKey, claims)
-
-	return ctx.Status(fiber.StatusOK).JSON(TokenResponse{
-		Token:     token,
-		ExpiresAt: epr,
-	})
+func (h HTTP) GetCategories(ctx *fiber.Ctx) error {
+	return nil
 }
 
 func (h HTTP) GetAds(ctx *fiber.Ctx) error {
@@ -112,38 +79,86 @@ func (h HTTP) GetAds(ctx *fiber.Ctx) error {
 }
 
 func (h HTTP) GetAd(ctx *fiber.Ctx) error {
-	return nil
+	// get id from request
+	id, _ := ctx.ParamsInt("id", 0)
+
+	// create ad model
+	ad := new(models.Ad)
+
+	// get ad from db
+	if err := h.DB.Model(&models.Ad{}).Where("id = ?", uint(id)).First(ad).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	// check id
+	if ad.ID != uint(id) {
+		return fiber.ErrNotFound
+	}
+
+	// get ad user
+	user := new(models.User)
+
+	// get user by id
+	if err := h.DB.Model(&models.User{}).Where("id = ?", ad.UserID).First(user).Error; err != nil {
+		return fiber.ErrNotFound
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(AdResponse{
+		ID:          ad.ID,
+		Title:       ad.Title,
+		Description: ad.Description,
+		Status:      ad.Status,
+		Image:       ad.Image,
+		CreatedAt:   ad.CreatedAt,
+		User: UserResponse{
+			Username: user.Username,
+			Email:    user.Email,
+		},
+	})
 }
 
+// CreateAd handles creating a new ad.
 func (h HTTP) CreateAd(ctx *fiber.Ctx) error {
-	return nil
+	// get ad information
+	title := ctx.FormValue("title")
+	description := ctx.FormValue("description")
+	userID := ctx.Locals("user").(*UserClaims).ID
+	image := ""
+
+	// save input file into local storage
+	if form, err := ctx.MultipartForm(); err == nil {
+		for _, file := range form.File["image"] {
+			image = fmt.Sprintf("%s-%s", image, file.Filename)
+			if er := ctx.SaveFile(file, fmt.Sprintf("./images/%s", image)); er != nil {
+				return fiber.ErrInternalServerError
+			}
+		}
+	} else {
+		return fiber.ErrBadRequest
+	}
+
+	// create ad model
+	ad := &models.Ad{
+		Title:       title,
+		Description: description,
+		UserID:      userID,
+		Image:       image,
+		Status:      models.PendingStatus,
+	}
+
+	// save ad to database
+	if err := h.DB.Create(ad).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }
 
 func (h HTTP) DeleteAd(ctx *fiber.Ctx) error {
 	return nil
 }
 
-func (h HTTP) UpdateAd(ctx *fiber.Ctx) error {
-	return nil
-}
-
 func (h HTTP) GetAdImage(ctx *fiber.Ctx) error {
-	return nil
-}
-
-func (h HTTP) GetCategories(ctx *fiber.Ctx) error {
-	return nil
-}
-
-func (h HTTP) CreateCategory(ctx *fiber.Ctx) error {
-	return nil
-}
-
-func (h HTTP) UpdateCategory(ctx *fiber.Ctx) error {
-	return nil
-}
-
-func (h HTTP) DeleteCategory(ctx *fiber.Ctx) error {
 	return nil
 }
 
@@ -164,21 +179,5 @@ func (h HTTP) DeleteUser(ctx *fiber.Ctx) error {
 }
 
 func (h HTTP) UpdateUserAd(ctx *fiber.Ctx) error {
-	return nil
-}
-
-func (h HTTP) GetAdmins(ctx *fiber.Ctx) error {
-	return nil
-}
-
-func (h HTTP) CreateAdmin(ctx *fiber.Ctx) error {
-	return nil
-}
-
-func (h HTTP) UpdateAdmin(ctx *fiber.Ctx) error {
-	return nil
-}
-
-func (h HTTP) DeleteAdmin(ctx *fiber.Ctx) error {
 	return nil
 }

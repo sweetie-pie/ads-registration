@@ -14,4 +14,5 @@ type Ad struct {
 	Image       string
 	UserID      uint
 	AdminID     uint
+	Categories  []Category
 }
