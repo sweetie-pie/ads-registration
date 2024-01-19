@@ -290,8 +290,29 @@ func (h HTTP) GetUsers(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(list)
 }
 
+// CreateUser into the system.
 func (h HTTP) CreateUser(ctx *fiber.Ctx) error {
-	return nil
+	req := new(UserRequest)
+
+	// parse request body
+	if err := ctx.BodyParser(req); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	// create user model
+	model := &models.User{
+		Username:    req.Username,
+		Password:    toBase64(req.Password),
+		Email:       req.Email,
+		AccessLevel: req.AccessLevel,
+	}
+
+	// create user
+	if err := h.DB.Create(model).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }
 
 func (h HTTP) UpdateUser(ctx *fiber.Ctx) error {
