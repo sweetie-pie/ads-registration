@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/asaldelkhosh/ads-registration/internal/models"
@@ -212,8 +213,35 @@ func (h HTTP) CreateAd(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
+// DeleteAd removes an ad with its image.
 func (h HTTP) DeleteAd(ctx *fiber.Ctx) error {
-	return nil
+	// get id from request
+	id, _ := ctx.ParamsInt("id", 0)
+
+	// create ad model
+	ad := new(models.Ad)
+
+	// get ad from db
+	if err := h.DB.Model(&models.Ad{}).Where("id = ?", uint(id)).First(ad).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	// check id
+	if ad.ID != uint(id) {
+		return fiber.ErrNotFound
+	}
+
+	// delete image from storage
+	if err := os.RemoveAll("./images/" + ad.Image); err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	// delete from db
+	if err := h.DB.Delete(&models.Ad{}, "id = ?", uint(id)).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }
 
 func (h HTTP) GetAdImage(ctx *fiber.Ctx) error {
