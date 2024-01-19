@@ -315,6 +315,7 @@ func (h HTTP) CreateUser(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
+// UpdateUser manages user access level change.
 func (h HTTP) UpdateUser(ctx *fiber.Ctx) error {
 	// get id from request
 	id, _ := ctx.ParamsInt("id", 0)
@@ -349,8 +350,17 @@ func (h HTTP) UpdateUser(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
+// DeleteUser from database.
 func (h HTTP) DeleteUser(ctx *fiber.Ctx) error {
-	return nil
+	// get id from request
+	id, _ := ctx.ParamsInt("id", 0)
+
+	// delete from db
+	if err := h.DB.Delete(&models.User{}, "id = ?", uint(id)).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }
 
 // UpdateUserAd manages user ad status change.
