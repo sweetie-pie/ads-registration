@@ -1,56 +1,63 @@
 package http
 
 import (
-	"encoding/base64"
-
 	"github.com/asaldelkhosh/ads-registration/internal/models"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+// UserLogin handles user login into system.
 func (h HTTP) UserLogin(ctx *fiber.Ctx) error {
 	req := new(UserRequest)
 
+	// parse request body
 	if err := ctx.BodyParser(req); err != nil {
 		return fiber.ErrBadRequest
 	}
 
+	// create user model
 	user := new(models.User)
 
-	// get user
-	if err := h.DB.Model(&models.User{}).Where("username = ?", req.Username).First(user).Error; err != nil {
+	// get user by username or email
+	if err := h.DB.Model(&models.User{}).Where("username = ? or email = ?", req.Username, req.Email).First(user).Error; err != nil {
 		return fiber.ErrNotFound
 	}
 
 	// check password
-	if user.Password != base64.StdEncoding.EncodeToString([]byte(req.Password)) {
+	if user.Password != toBase64(req.Password) {
 		return fiber.ErrUnauthorized
 	}
 
-	// create claims
+	// create claims for jwt token
 	claims := &UserClaims{
 		Username: user.Username,
 		IsAdmin:  false,
 		Banned:   user.Banned,
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(claims)
+	return ctx.Status(fiber.StatusOK).JSON(TokenResponse{
+		Token: generateJWT(h.JWTKey, claims),
+	})
 }
 
+// UserSignup handles user registration into system.
 func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
 	req := new(UserRequest)
 
+	// parse request body
 	if err := ctx.BodyParser(req); err != nil {
 		return fiber.ErrBadRequest
 	}
 
+	// create user model
 	model := &models.User{
 		Username: req.Username,
-		Password: base64.StdEncoding.EncodeToString([]byte(req.Password)),
+		Password: toBase64(req.Password),
 		Email:    req.Email,
 		Banned:   false,
 	}
 
+	// create user
 	if err := h.DB.Create(model); err != nil {
 		return fiber.ErrInternalServerError
 	}
@@ -58,22 +65,24 @@ func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
+// AdminLogin manages admin login.
 func (h HTTP) AdminLogin(ctx *fiber.Ctx) error {
 	req := new(UserRequest)
 
+	// parse request body
 	if err := ctx.BodyParser(req); err != nil {
 		return fiber.ErrBadRequest
 	}
 
 	user := new(models.Admin)
 
-	// get user
-	if err := h.DB.Model(&models.User{}).Where("username = ?", req.Username).First(user).Error; err != nil {
+	// get admin by username or email
+	if err := h.DB.Model(&models.Admin{}).Where("username = ? or email = ?", req.Username, req.Email).First(user).Error; err != nil {
 		return fiber.ErrNotFound
 	}
 
 	// check password
-	if user.Password != base64.StdEncoding.EncodeToString([]byte(req.Password)) {
+	if user.Password != toBase64(req.Password) {
 		return fiber.ErrUnauthorized
 	}
 
@@ -85,7 +94,9 @@ func (h HTTP) AdminLogin(ctx *fiber.Ctx) error {
 		AccessLevel: user.AccessLevel,
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(claims)
+	return ctx.Status(fiber.StatusOK).JSON(TokenResponse{
+		Token: generateJWT(h.JWTKey, claims),
+	})
 }
 
 func (h HTTP) GetAds(ctx *fiber.Ctx) error {

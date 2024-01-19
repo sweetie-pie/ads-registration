@@ -9,7 +9,8 @@ import (
 )
 
 type HTTP struct {
-	DB *gorm.DB
+	DB     *gorm.DB
+	JWTKey string
 }
 
 func (h HTTP) Register(port string) error {
