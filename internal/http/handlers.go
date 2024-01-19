@@ -96,8 +96,14 @@ func (h HTTP) GetAds(ctx *fiber.Ctx) error {
 	// create a list of ads
 	records := make([]*models.Ad, 0)
 
+	// create a query
+	query := h.DB.Model(&models.Ad{}).Preload("Categories")
+	if ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
+		query = query.Where("status = ?", models.PublishedStatus)
+	}
+
 	// get from db
-	if err := h.DB.Model(&models.Ad{}).Preload("User").Preload("Categories").Where("status = ?", models.PublishedStatus).Find(records).Error; err != nil {
+	if err := query.Find(records).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -118,16 +124,13 @@ func (h HTTP) GetAds(ctx *fiber.Ctx) error {
 			Image:       ad.Image,
 			CreatedAt:   ad.CreatedAt,
 			Categories:  tmp,
-			User: UserResponse{
-				Username: ad.User.Username,
-				Email:    ad.User.Email,
-			},
 		})
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(list)
 }
 
+// GetAd by its id.
 func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 	// get id from request
 	id, _ := ctx.ParamsInt("id", 0)
@@ -135,8 +138,14 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 	// create ad model
 	ad := new(models.Ad)
 
+	// create a query
+	query := h.DB.Model(&models.Ad{}).Preload("User").Preload("Categories")
+	if ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
+		query = query.Where("status = ?", models.PublishedStatus)
+	}
+
 	// get ad from db
-	if err := h.DB.Model(&models.Ad{}).Preload("Categories").Where("id = ?", uint(id)).Where("status = ?", models.PublishedStatus).First(ad).Error; err != nil {
+	if err := query.First(ad).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -159,6 +168,10 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 		Image:       ad.Image,
 		CreatedAt:   ad.CreatedAt,
 		Categories:  list,
+		User: UserResponse{
+			Username: ad.User.Username,
+			Email:    ad.User.Email,
+		},
 	})
 }
 
@@ -367,7 +380,7 @@ func (h HTTP) DeleteUser(ctx *fiber.Ctx) error {
 func (h HTTP) UpdateUserAd(ctx *fiber.Ctx) error {
 	// get id from request
 	id, _ := ctx.ParamsInt("id", 0)
-	status := ctx.Query("status", "reject")
+	status := ctx.QueryInt("status", 1)
 
 	// create ad model
 	ad := new(models.Ad)
@@ -377,14 +390,7 @@ func (h HTTP) UpdateUserAd(ctx *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	// update status
-	if status == "reject" {
-		ad.Status = models.RejectedStatus
-	} else if status == "accept" {
-		ad.Status = models.PublishedStatus
-	} else {
-		ad.Status = models.PendingStatus
-	}
+	ad.Status = status
 
 	// update in db
 	if err := h.DB.Save(ad).Error; err != nil {
