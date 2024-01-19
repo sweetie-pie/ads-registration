@@ -244,8 +244,25 @@ func (h HTTP) DeleteAd(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
+// GetAdImage returns the image of an ad.
 func (h HTTP) GetAdImage(ctx *fiber.Ctx) error {
-	return nil
+	// get id from request
+	id, _ := ctx.ParamsInt("id", 0)
+
+	// create ad model
+	ad := new(models.Ad)
+
+	// get ad from db
+	if err := h.DB.Model(&models.Ad{}).Where("id = ?", uint(id)).First(ad).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	// check id
+	if ad.ID != uint(id) {
+		return fiber.ErrNotFound
+	}
+
+	return ctx.Status(fiber.StatusOK).SendFile("./images/" + ad.Image)
 }
 
 func (h HTTP) GetUsers(ctx *fiber.Ctx) error {
