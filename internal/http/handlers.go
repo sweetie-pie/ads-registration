@@ -316,7 +316,37 @@ func (h HTTP) CreateUser(ctx *fiber.Ctx) error {
 }
 
 func (h HTTP) UpdateUser(ctx *fiber.Ctx) error {
-	return nil
+	// get id from request
+	id, _ := ctx.ParamsInt("id", 0)
+
+	req := new(UserRequest)
+
+	// parse request body
+	if err := ctx.BodyParser(req); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	// create user model
+	user := new(models.User)
+
+	// get user from db
+	if err := h.DB.Model(&models.User{}).Where("id = ?", uint(id)).First(user).Error; err != nil {
+		return fiber.ErrNotFound
+	}
+
+	// check user id
+	if user.ID != uint(id) {
+		return fiber.ErrNotFound
+	}
+
+	user.AccessLevel = req.AccessLevel
+
+	// update user
+	if err := h.DB.Save(user).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }
 
 func (h HTTP) DeleteUser(ctx *fiber.Ctx) error {
