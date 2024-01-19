@@ -23,9 +23,6 @@ func generateJWT(key string, claims *UserClaims) (string, time.Time, error) {
 	c["exp"] = expireTime.Unix()
 	c["id"] = claims.ID
 	c["username"] = claims.Username
-	c["is_admin"] = claims.IsAdmin
-	c["banned"] = claims.Banned
-	c["active"] = claims.Active
 	c["access_level"] = claims.AccessLevel
 
 	// generate token string
@@ -54,9 +51,6 @@ func parseJWT(key string, token string) (*UserClaims, error) {
 		c := &UserClaims{
 			ID:          claims["id"].(uint),
 			Username:    claims["username"].(string),
-			IsAdmin:     claims["is_admin"].(bool),
-			Banned:      claims["banned"].(bool),
-			Active:      claims["active"].(bool),
 			AccessLevel: claims["access_level"].(int),
 		}
 
