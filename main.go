@@ -27,7 +27,6 @@ func readDatabaseCredentialsFromEnv() string {
 func migrateDatabaseModels(db *gorm.DB) error {
 	classes := []interface{}{
 		&models.User{},
-		&models.Admin{},
 		&models.Ad{},
 		&models.Category{},
 	}
