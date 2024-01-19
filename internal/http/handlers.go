@@ -274,8 +274,14 @@ func (h HTTP) GetAdImage(ctx *fiber.Ctx) error {
 	// create ad model
 	ad := new(models.Ad)
 
+	// create a query
+	query := h.DB.Model(&models.Ad{})
+	if ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
+		query = query.Where("status = ?", models.PublishedStatus)
+	}
+
 	// get ad from db
-	if err := h.DB.Model(&models.Ad{}).Where("id = ?", uint(id)).First(ad).Error; err != nil {
+	if err := query.First(ad).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -389,7 +395,7 @@ func (h HTTP) DeleteUser(ctx *fiber.Ctx) error {
 func (h HTTP) UpdateUserAd(ctx *fiber.Ctx) error {
 	// get id from request
 	id, _ := ctx.ParamsInt("id", 0)
-	status := ctx.QueryInt("status", 1)
+	status := ctx.QueryInt("status", models.RejectedStatus)
 
 	// create ad model
 	ad := new(models.Ad)
