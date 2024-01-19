@@ -97,7 +97,7 @@ func (h HTTP) GetAds(ctx *fiber.Ctx) error {
 	records := make([]*models.Ad, 0)
 
 	// get from db
-	if err := h.DB.Model(&models.Ad{}).Preload("User").Preload("Categories").Find(records).Error; err != nil {
+	if err := h.DB.Model(&models.Ad{}).Preload("User").Preload("Categories").Where("status = ?", models.PublishedStatus).Find(records).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -136,7 +136,7 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 	ad := new(models.Ad)
 
 	// get ad from db
-	if err := h.DB.Model(&models.Ad{}).Preload("Categories").Where("id = ?", uint(id)).First(ad).Error; err != nil {
+	if err := h.DB.Model(&models.Ad{}).Preload("Categories").Where("id = ?", uint(id)).Where("status = ?", models.PublishedStatus).First(ad).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -264,6 +264,33 @@ func (h HTTP) DeleteUser(ctx *fiber.Ctx) error {
 	return nil
 }
 
+// UpdateUserAd manages user ad status change.
 func (h HTTP) UpdateUserAd(ctx *fiber.Ctx) error {
-	return nil
+	// get id from request
+	id, _ := ctx.ParamsInt("id", 0)
+	status := ctx.Query("status", "reject")
+
+	// create ad model
+	ad := new(models.Ad)
+
+	// get ad from db
+	if err := h.DB.Model(&models.Ad{}).Where("id = ?", uint(id)).First(ad).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	// update status
+	if status == "reject" {
+		ad.Status = models.RejectedStatus
+	} else if status == "accept" {
+		ad.Status = models.PublishedStatus
+	} else {
+		ad.Status = models.PendingStatus
+	}
+
+	// update in db
+	if err := h.DB.Save(ad).Error; err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return ctx.SendStatus(fiber.StatusOK)
 }
