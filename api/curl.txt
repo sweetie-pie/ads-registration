@@ -1,0 +1,19 @@
+curl "http://localhost:8080/auth/user/login" \
+    -H 'Content-Type: application/json' \
+    -d '
+    {
+        "username": "amirhossein",
+        "password": "12345",
+        "email": "najafizadeh21@gmail.com"
+    }
+'
+
+curl "http://localhost:8080/auth/user/signup" \
+    -H 'Content-Type: application/json' \
+    -d '
+    {
+        "username": "amirhossein",
+        "password": "12345",
+        "email": "najafizadeh21@gmail.com"
+    }
+'

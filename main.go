@@ -60,7 +60,7 @@ func main() {
 	}
 
 	// create image directory
-	if _, err := os.Stat("/images"); os.IsNotExist(err) {
+	if _, err := os.Stat("images"); os.IsNotExist(err) {
 		if er := os.Mkdir("images", 0750); er != nil {
 			log.Fatal("error creating images dir", er)
 		}

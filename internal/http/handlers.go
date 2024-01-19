@@ -2,7 +2,6 @@ package http
 
 import (
 	"github.com/asaldelkhosh/ads-registration/internal/models"
-
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -62,7 +61,7 @@ func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
 	}
 
 	// create user
-	if err := h.DB.Create(model); err != nil {
+	if err := h.DB.Create(model).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
