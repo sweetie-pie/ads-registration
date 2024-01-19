@@ -27,7 +27,7 @@ func (h HTTP) Register(port string) error {
 	auth.Post("/user/signup", h.UserSignup) // for users
 	auth.Post("/admin/login", h.AdminLogin) // for admins
 
-	api := app.Group("/api", JWTToken)
+	api := app.Group("/api", JWTToken(h.JWTKey))
 
 	// ads apis
 	ads := api.Group("/ads", CheckBannedUser)

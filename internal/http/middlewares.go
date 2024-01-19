@@ -2,15 +2,22 @@ package http
 
 import "github.com/gofiber/fiber/v2"
 
-func JWTToken(ctx *fiber.Ctx) error {
-	token := ctx.Get("x-token", "null")
-	if token == "null" {
-		return fiber.ErrUnauthorized
+func JWTToken(key string) func(ctx *fiber.Ctx) error {
+	return func(ctx *fiber.Ctx) error {
+		token := ctx.Get("x-token", "null")
+		if token == "null" {
+			return fiber.ErrUnauthorized
+		}
+
+		claims, err := parseJWT(key, token)
+		if err != nil {
+			return fiber.ErrUnauthorized
+		}
+
+		ctx.Locals("user", claims)
+
+		return ctx.Next()
 	}
-
-	// todo: get user claims from x-token
-
-	return ctx.Next()
 }
 
 func CheckAdmin(ctx *fiber.Ctx) error {
