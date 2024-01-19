@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/asaldelkhosh/ads-registration/internal/models"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -110,6 +111,10 @@ func (h HTTP) GetAds(ctx *fiber.Ctx) error {
 	return nil
 }
 
+func (h HTTP) GetAd(ctx *fiber.Ctx) error {
+	return nil
+}
+
 func (h HTTP) CreateAd(ctx *fiber.Ctx) error {
 	return nil
 }
@@ -131,6 +136,10 @@ func (h HTTP) GetCategories(ctx *fiber.Ctx) error {
 }
 
 func (h HTTP) CreateCategory(ctx *fiber.Ctx) error {
+	return nil
+}
+
+func (h HTTP) UpdateCategory(ctx *fiber.Ctx) error {
 	return nil
 }
 

@@ -33,6 +33,7 @@ func (h HTTP) Register(port string) error {
 	ads := api.Group("/ads", CheckBannedUser)
 	ads.Get("/", h.GetAds)
 	ads.Post("/", h.CreateAd)
+	ads.Get("/:id", h.GetAd)
 	ads.Post("/:id", h.UpdateAd)
 	ads.Delete("/:id", h.DeleteAd)
 	ads.Get("/:id/image", h.GetAdImage)
@@ -42,6 +43,7 @@ func (h HTTP) Register(port string) error {
 	categories := api.Group("/categories")
 	categories.Get("/", h.GetCategories)
 	categories.Post("/", CheckAdmin, CheckAccessLevel(2, 3), h.CreateCategory)
+	categories.Post("/:id", CheckAdmin, CheckAccessLevel(2, 3), h.UpdateCategory)
 	categories.Delete("/:id", CheckAdmin, CheckAccessLevel(2, 3), h.DeleteCategory)
 
 	// users apis
