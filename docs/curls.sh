@@ -42,3 +42,17 @@ curl "http://localhost:8080/api/ads" \
 curl "http://localhost:8080/api/ads/1" \
     -X GET \
     -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'
+
+# get all categories
+curl "http://localhost:8080/api/categories" \
+    -X GET \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'
+
+# update ad status (only admins)
+curl "http://localhost:8080/api/ads/1/status?status=1" \
+    -X POST \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'
+
+# get image of ad
+curl "http://localhost:8080/api/ads/1/image" \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'

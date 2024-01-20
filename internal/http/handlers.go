@@ -277,7 +277,7 @@ func (h HTTP) GetAdImage(ctx *fiber.Ctx) error {
 
 	// create a query
 	query := h.DB.Model(&models.Ad{})
-	if ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
+	if ctx.Locals("user") != nil && ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
 		query = query.Where("status = ?", models.PublishedStatus)
 	}
 
