@@ -61,3 +61,22 @@ curl "http://localhost:8080/api/ads/1/image" \
 curl "http://localhost:8080/api/ads/1" \
     -X DELETE \
     -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'
+
+# get all users
+curl "http://localhost:8080/api/users" \
+    -X GET \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'
+
+# create user // access level 3 is admin, 2 is writer, and 1 is viewer
+curl "http://localhost:8080/api/users" \
+    -i -X POST \
+    -H 'Content-Type: application/json' \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc' \
+    -d '
+    {
+        "username": "alireza",
+        "password": "12345",
+        "email": "ali@gmail.com",
+        "access_level": 3
+    }
+'
