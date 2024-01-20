@@ -1,38 +1,38 @@
 # Ads Registration
 
-Creating an Ads registration service.
+Creating an Ads registration service using __Golang__ and __MySQL__.
+
+## Setup
+
+Use the following command to set up the project:
+
+```shell
+docker compose up -d
+```
 
 ## Models
+
+Our database models are as below:
 
 ### User
 
 - ID
 - Username (string)
 - Password (string)
-- Email (string)
-- Banned (boolean)
-
-### Admin
-
-- ID
-- Username (string)
-- Password (string)
-- Email (string)
-- Active (boolean)
-- Access Level (enum:={"viewer", "writer", "admin"})
+- AccessLevel (enum:={"viewer=1", "writer=2", "admin=3"})
 
 ### Ad
 
 - ID
 - Title (string)
 - Description (string)
-- Status (enum:={"published", "rejected", "pending"})
+- Status (enum:={"published=1", "rejected=2", "pending=3"})
 - Created At (string)
 - Image (string)
-- Creator (ID)
+- User (ID)
 
 ### Category
 
 - ID
 - Title (string)
-- Description (string)
+- AdID (ID)
