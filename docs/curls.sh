@@ -28,7 +28,17 @@ curl "http://localhost:8080/api/signup" \
 curl "http://localhost:8080/api/ads" \
     -H 'Content-type: multipart/form-data' \
     -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc' \
-    -F title="my ad" \
+    -F title="my ad 2" \
     -F description="testing ad" \
     -F categories="test,test2,test3" \
     -F image='@README.md'
+
+# get all ads (if admin it will return all, if not just published ones)
+curl "http://localhost:8080/api/ads" \
+    -X GET \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'
+
+# get ad by id (if admin it will return any status ad, if not just published ones)
+curl "http://localhost:8080/api/ads/1" \
+    -X GET \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'

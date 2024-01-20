@@ -23,5 +23,5 @@ type AdResponse struct {
 	Image       string       `json:"image"`
 	Categories  []string     `json:"categories"`
 	CreatedAt   time.Time    `json:"created_at"`
-	User        UserResponse `json:"username"`
+	User        UserResponse `json:"user"`
 }

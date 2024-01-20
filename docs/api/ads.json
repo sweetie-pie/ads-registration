@@ -1,0 +1,47 @@
+[
+  {
+    "endpoint": "/api/ads",
+    "method": "GET",
+    "headers": [
+      "x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc"
+    ],
+    "response": [
+      {
+        "id": 1,
+        "title": "my ad",
+        "description": "testing ad",
+        "status": 3,
+        "image": "-README.md",
+        "categories": [
+          "test",
+          "test2",
+          "test3"
+        ],
+        "created_at": "2024-01-20T15:39:11.359+03:30"
+      }
+    ]
+  },
+  {
+    "endpoint": "/api/ads/2",
+    "method": "GET",
+    "headers": [
+      "x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc"
+    ],
+    "response": {
+      "id": 1,
+      "title": "my ad",
+      "description": "testing ad",
+      "status": 3,
+      "image": "-README.md",
+      "categories": [
+        "test",
+        "test2",
+        "test3"
+      ],
+      "created_at": "2024-01-20T15:39:11.359+03:30",
+      "user": {
+        "username": ""
+      }
+    }
+  }
+]

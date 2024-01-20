@@ -79,7 +79,7 @@ func (h HTTP) GetCategories(ctx *fiber.Ctx) error {
 	records := make([]*models.Category, 0)
 
 	// get from db
-	if err := h.DB.Model(&models.Category{}).Distinct("title").Find(records).Error; err != nil {
+	if err := h.DB.Model(&models.Category{}).Distinct("title").Find(&records).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -102,7 +102,7 @@ func (h HTTP) GetAds(ctx *fiber.Ctx) error {
 
 	// create a query
 	query := h.DB.Model(&models.Ad{}).Preload("Categories")
-	if ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
+	if ctx.Locals("user") != nil && ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
 		query = query.Where("status = ?", models.PublishedStatus)
 	}
 
@@ -113,7 +113,7 @@ func (h HTTP) GetAds(ctx *fiber.Ctx) error {
 	}
 
 	// get from db
-	if err := query.Find(records).Error; err != nil {
+	if err := query.Find(&records).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
@@ -150,7 +150,7 @@ func (h HTTP) GetAd(ctx *fiber.Ctx) error {
 
 	// create a query
 	query := h.DB.Model(&models.Ad{}).Preload("User").Preload("Categories")
-	if ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
+	if ctx.Locals("user") != nil && ctx.Locals("user").(*UserClaims).AccessLevel != models.AccessLevelAdmin {
 		query = query.Where("status = ?", models.PublishedStatus)
 	}
 
@@ -300,7 +300,7 @@ func (h HTTP) GetUsers(ctx *fiber.Ctx) error {
 	records := make([]*models.User, 0)
 
 	// get from db
-	if err := h.DB.Model(&models.User{}).Find(records).Error; err != nil {
+	if err := h.DB.Model(&models.User{}).Find(&records).Error; err != nil {
 		return fiber.ErrInternalServerError
 	}
 
