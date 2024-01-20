@@ -44,7 +44,7 @@ func main() {
 	// load .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("error loading .env file", err)
+		log.Println("error loading .env file", err)
 	}
 
 	// connect to mysql database
