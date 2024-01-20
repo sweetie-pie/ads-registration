@@ -2,7 +2,6 @@ package http
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -198,13 +197,12 @@ func (h HTTP) CreateAd(ctx *fiber.Ctx) error {
 	// save input file into local storage
 	if form, err := ctx.MultipartForm(); err == nil {
 		for _, file := range form.File["image"] {
-			image = fmt.Sprintf("%s-%s", image, file.Filename)
+			image = fmt.Sprintf("%s-%s", toBase64(title), file.Filename)
 			if er := ctx.SaveFile(file, fmt.Sprintf("./images/%s", image)); er != nil {
 				return fiber.ErrInternalServerError
 			}
 		}
 	} else {
-		log.Println(err)
 		return fiber.ErrBadRequest
 	}
 
