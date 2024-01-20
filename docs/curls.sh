@@ -80,3 +80,22 @@ curl "http://localhost:8080/api/users" \
         "access_level": 3
     }
 '
+
+# update user
+curl "http://localhost:8080/api/users/18" \
+    -i -X POST \
+    -H 'Content-Type: application/json' \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc' \
+    -d '
+    {
+        "username": "alireza",
+        "password": "123467",
+        "email": "ali@gmail.com",
+        "access_level": 2
+    }
+'
+
+# delete user
+curl "http://localhost:8080/api/users/18" \
+    -i -X DELETE \
+    -H 'x-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfbGV2ZWwiOjMsImV4cCI6MTcwNTc1OTYwMSwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.ISOYZ4pFgWDRov3OGqggrM0bhnE_f9mQti86mly1Qzc'

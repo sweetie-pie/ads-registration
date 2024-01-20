@@ -369,6 +369,9 @@ func (h HTTP) UpdateUser(ctx *fiber.Ctx) error {
 		return fiber.ErrNotFound
 	}
 
+	user.Username = req.Username
+	user.Email = req.Email
+	user.Password = toBase64(req.Password)
 	user.AccessLevel = req.AccessLevel
 
 	// update user
