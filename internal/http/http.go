@@ -38,17 +38,17 @@ func (h HTTP) Register(port string) error {
 
 	// ads global apis
 	ads := api.Group("/ads")
-	ads.Get("/", h.GetAds) // query keyword for searching
-	ads.Get("/:id", h.GetAd)
-	ads.Get("/:id/image", h.GetAdImage)
+	ads.Get("/", JWTToken(h.JWTKey, true), h.GetAds) // query keyword for searching
+	ads.Get("/:id", JWTToken(h.JWTKey, true), h.GetAd)
+	ads.Get("/:id/image", JWTToken(h.JWTKey, true), h.GetAdImage)
 
 	// ads private apis
-	ads.Post("/", JWTToken(h.JWTKey), CheckAccessLevel(models.AccessLevelWriter, models.AccessLevelAdmin), h.CreateAd)
-	ads.Delete("/:id", JWTToken(h.JWTKey), CheckAccessLevel(models.AccessLevelAdmin), h.DeleteAd)
-	ads.Post("/:id/status", JWTToken(h.JWTKey), CheckAccessLevel(models.AccessLevelAdmin), h.UpdateUserAd)
+	ads.Post("/", JWTToken(h.JWTKey, false), CheckAccessLevel(models.AccessLevelWriter, models.AccessLevelAdmin), h.CreateAd)
+	ads.Delete("/:id", JWTToken(h.JWTKey, false), CheckAccessLevel(models.AccessLevelAdmin), h.DeleteAd)
+	ads.Post("/:id/status", JWTToken(h.JWTKey, false), CheckAccessLevel(models.AccessLevelAdmin), h.UpdateUserAd)
 
 	// admins private apis
-	users := api.Group("/users", JWTToken(h.JWTKey), CheckAccessLevel(models.AccessLevelAdmin))
+	users := api.Group("/users", JWTToken(h.JWTKey, false), CheckAccessLevel(models.AccessLevelAdmin))
 	users.Get("/", h.GetUsers)
 	users.Post("/", h.CreateUser)
 	users.Post("/:id", h.UpdateUser)

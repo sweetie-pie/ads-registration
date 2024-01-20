@@ -1,12 +1,18 @@
 package http
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 // JWTToken parses user JWT from http request.
-func JWTToken(key string) func(ctx *fiber.Ctx) error {
+func JWTToken(key string, allow bool) func(ctx *fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
 		token := ctx.Get("x-token", "null")
 		if token == "null" {
+			if allow {
+				return ctx.Next()
+			}
+
 			return fiber.ErrUnauthorized
 		}
 
