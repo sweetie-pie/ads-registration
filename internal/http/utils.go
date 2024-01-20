@@ -21,7 +21,7 @@ func generateJWT(key string, claims *UserClaims) (string, time.Time, error) {
 	// create claims
 	c := token.Claims.(jwt.MapClaims)
 	c["exp"] = expireTime.Unix()
-	c["id"] = claims.ID
+	c["user_id"] = claims.ID
 	c["username"] = claims.Username
 	c["access_level"] = claims.AccessLevel
 
@@ -49,9 +49,9 @@ func parseJWT(key string, token string) (*UserClaims, error) {
 	// taking out claims
 	if claims, ok := t.Claims.(jwt.MapClaims); ok && t.Valid {
 		c := &UserClaims{
-			ID:          claims["id"].(uint),
+			ID:          uint(claims["user_id"].(float64)),
 			Username:    claims["username"].(string),
-			AccessLevel: claims["access_level"].(int),
+			AccessLevel: int(claims["access_level"].(float64)),
 		}
 
 		return c, nil

@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -59,9 +60,10 @@ func (h HTTP) UserSignup(ctx *fiber.Ctx) error {
 
 	// create user model
 	model := &models.User{
-		Username: req.Username,
-		Password: toBase64(req.Password),
-		Email:    req.Email,
+		Username:    req.Username,
+		Password:    toBase64(req.Password),
+		Email:       req.Email,
+		AccessLevel: models.AccessLevelWriter,
 	}
 
 	// create user
@@ -202,6 +204,7 @@ func (h HTTP) CreateAd(ctx *fiber.Ctx) error {
 			}
 		}
 	} else {
+		log.Println(err)
 		return fiber.ErrBadRequest
 	}
 
